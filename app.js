@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 app.get('/tips/:alltips', (req, res) => {
     const sql = "SELECT * FROM tipstips order by rand()";
     db.query(sql, [req.params.tipstips], (error, result) => {
-       if (result===0) {
+       if (result == 0) {
         res.send({status: 'not found'});
        } else{
         res.send(result);
@@ -56,7 +56,7 @@ app.get('/tips/:Id', (req, res) => {
 app.get('/:solution', (req, res) => {
     const sql = "SELECT * FROM solution";
     db.query(sql, [req.params.solution], (error, result) => {
-       if (result===0) {
+       if (result == 0) {
         res.send({status: 'not found'});
        } else{
         res.send(result);
@@ -111,9 +111,3 @@ app.get('/solution/contact/:Id', (req, res) => {
 //     res.send('update berhasil')
 // })
 
-
-function add(req,res){
-    const post ={
-
-    }
-}
