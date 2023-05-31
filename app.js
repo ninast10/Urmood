@@ -21,12 +21,6 @@ app.get('/', (req, res) => {
     res.send( "connect");
 });
 
-// const pool = mysql.createConnection({
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASS,
-//     database: process.env.DB_NAME,
-//     socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
-// });
 
 //GET all tips ramdomly
 app.get('/tips/:alltips', (req, res) => {
