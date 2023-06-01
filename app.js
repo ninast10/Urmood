@@ -123,8 +123,8 @@ app.get('/article/5', (req, res) => {
 
 
 
-//GET the consulting service contact by Id
-app.get('/consul/1', (req, res) => {
+//GET the counselling service contact by Id
+app.get('/contact/1', (req, res) => {
     res.send({
         data: {
             contact: 'https://cmlabs.co/id-id/promo/free-consultation-benefit'
@@ -132,7 +132,7 @@ app.get('/consul/1', (req, res) => {
      });
 });
 
-app.get('/consul/2', (req, res) => {
+app.get('/contact/2', (req, res) => {
     res.send({
         data: {
             contact: 'http://www.brainfit.co.id/free-consultation-2/'
@@ -140,7 +140,7 @@ app.get('/consul/2', (req, res) => {
      });
 });
 
-app.get('/consul/3', (req, res) => {
+app.get('/contact/3', (req, res) => {
     res.send({
         data: {
             contact: 'https://hopeforhealingfoundation.org'
@@ -148,7 +148,7 @@ app.get('/consul/3', (req, res) => {
      });
 });
 
-app.get('/consul/4', (req, res) => {
+app.get('/contact/4', (req, res) => {
     res.send({
         data: {
             contact: 'https://www.aeccglobal.co.id/id/contact-us/'
