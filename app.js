@@ -156,7 +156,7 @@ app.get('/contact/4', (req, res) => {
      });
 });
 
-app.get('/consul/5', (req, res) => {
+app.get('/contact/5', (req, res) => {
     res.send({
         data: {
             contact: 'https://www.ibunda.id/'
