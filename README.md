@@ -19,7 +19,4 @@ detail API documentation:
 
 https://documenter.getpostman.com/view/26401567/2s93mBwJSP
 
-author: 
-1. Lanina Astrid Chrysant Vrij
-2. Zahra Salsabilla
 
