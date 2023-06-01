@@ -123,7 +123,7 @@ app.get('/article/5', (req, res) => {
 
 
 
-//GET the consultation service by Id
+//GET the consulting service by Id
 app.get('/consul/1', (req, res) => {
     res.send({
         data: {
