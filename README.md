@@ -7,9 +7,9 @@ This API allows you to get the tips, article, and info about consulting service 
 
 Range Id:
 
-Tips: 1 - 5
-Article: 1 - 5
-contact: 1 - 5
+1. Tips: 1 - 5
+2. Article: 1 - 5
+3. contact: 1 - 5
 
 endpoint:
 
