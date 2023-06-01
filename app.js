@@ -37,6 +37,7 @@ app.get('/:tips', (req, res) => {
      });
 });
 
+
 //GET tips by Id
 app.get('/tips/1', (req, res) => {
     res.send({
@@ -77,6 +78,7 @@ app.get('/tips/5', (req, res) => {
        }
     });
 });
+
 
 //GET aerticle by Id
 app.get('/article/1', (req, res) => {
@@ -121,8 +123,8 @@ app.get('/article/5', (req, res) => {
 
 
 
-//GET the consultation contact by Id
-app.get('/contact/1', (req, res) => {
+//GET the consultation service by Id
+app.get('/consul/1', (req, res) => {
     res.send({
         data: {
             contact: 'https://cmlabs.co/id-id/promo/free-consultation-benefit'
@@ -130,7 +132,7 @@ app.get('/contact/1', (req, res) => {
      });
 });
 
-app.get('/contact/2', (req, res) => {
+app.get('/consul/2', (req, res) => {
     res.send({
         data: {
             contact: 'http://www.brainfit.co.id/free-consultation-2/'
@@ -138,7 +140,7 @@ app.get('/contact/2', (req, res) => {
      });
 });
 
-app.get('/contact/3', (req, res) => {
+app.get('/consul/3', (req, res) => {
     res.send({
         data: {
             contact: 'https://hopeforhealingfoundation.org'
@@ -146,7 +148,7 @@ app.get('/contact/3', (req, res) => {
      });
 });
 
-app.get('/contact/4', (req, res) => {
+app.get('/consul/4', (req, res) => {
     res.send({
         data: {
             contact: 'https://www.aeccglobal.co.id/id/contact-us/'
@@ -154,7 +156,7 @@ app.get('/contact/4', (req, res) => {
      });
 });
 
-app.get('/contact/5', (req, res) => {
+app.get('/consul/5', (req, res) => {
     res.send({
         data: {
             contact: 'https://www.ibunda.id/'
