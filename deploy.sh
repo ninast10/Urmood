@@ -1,8 +1,8 @@
 GOOGLE_PROJECT_ID=bold-artifact-380715
 CLOUD_RUN_SERVICE=urmood-api
-INSTANCE_CONNECTION_NAME=bold-artifact-380715:asia-southeast2:test
+INSTANCE_CONNECTION_NAME='process.env.INS_NAME'
 DB_USER=root
-DB_PASS='password'
+DB_PASS='process.env.DB_PASS'
 DB_NAME=solutiondb
 
 gcloud builds submit --tag gcr.io/$GOOGLE_PROJECT_ID/$CLOUD_RUN_SERVICE \
