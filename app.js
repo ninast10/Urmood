@@ -1,165 +1,146 @@
-require('dotenv').config()
-
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
-//const connection = require('./database.js');
-//const mysql = require('mysql');
-//const db = require('./connection');
-//const response =require('./response');
+const db = require('./db');
+const bcrypt = require('bcryptjs');
+const { body, validationResult} = require('express-validator');
 
-app.use(bodyParser.json());
 app.use(express.json());
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
     console.log(`app listening in port ${port}`);
 });
 
-
 app.get('/', (req, res) => {
     res.send( "connect");
 });
 
-// const pool = mysql.createConnection({
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASS,
-//     database: process.env.DB_NAME,
-//     socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
-// });
+//Validation Input register endpoint
+const registerValidation = [
+    body('fullname', 'Full name required').notEmpty(),
+    body('email', 'Email required').notEmpty().matches(/.+\@.+\..+/).withMessage('Invalid email, try using @'),
+    body('password', 'Password required').notEmpty().isLength({min: 6}).withMessage('Password at least 6 characters'),
+];
 
-//GET all tips
-app.get('/:tips', (req, res) => {
-     res.send({
-        data: {
-            tips: 'Open, accepting, and loving toward yourself and what you are going through, consider a simple exercise such as wallk, try something new, accept and validate your emotions, and getting enough sleep'
+//Register 
+app.post('/register', registerValidation, (req, res) => {
+    const {fullname, email, password} = req.body;
+
+    //validation check
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array() });
+    }
+    
+    //check email already exist or not
+    const sql = 'SELECT * FROM users WHERE email = ?';
+    db.query(sql, [email], (err, result) => {
+        if (err) {
+            console.error('Registration failed: '. err);
+            return res.status(500).json({error: 'Registration failed'});
+        }  
+                                        
+        if (result.length > 0) {
+                return res.status(400).json({error: 'Email already exist'});
         }
-     });
-});
-
-
-//GET tips by Id
-app.get('/tips/1', (req, res) => {
-    res.send({
-       data: {
-           tips: 'Recognize and appreciate your goals achievement'
-       }
+        //encryption password with bcrypt
+        bcrypt.hash(password, 10, (err, hashedPassword) => {
+            if (err) {
+                console.error('Failed to encrypt the password:', err);
+                return res.status(500).json({ error: 'Registration failed'});
+            }
+            const sql = 'INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)';
+            db.query(sql, [fullname, email, hashedPassword], (err, result) => {
+                if (err) {
+                    console.error('Registration failed: ', err);
+                    return res.status(500).json({error: 'Registration failed'});
+                }
+                return res.status(200).json({message: 'Registration successful'});
+            });
+        });
     });
 });
 
-app.get('/tips/2', (req, res) => {
-    res.send({
-       data: {
-           tips: 'Do something that is pleasurable or meaningful'
-       }
+//Validation Input login endpoint
+const loginValidation = [
+    body('email', 'Fill with registered email').notEmpty().matches(/.+\@.+\..+/).withMessage('Invalid email, try using @'),
+    body('password', 'Password required').notEmpty().isLength({min: 8}).withMessage('Password at least 6 characters'),
+];
+
+app.post('/login', loginValidation, (req, res) => {
+    const {email, password} = req.body;
+
+    //validation check
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array() });
+    }
+
+    const sql = 'SELECT * FROM users WHERE email = ?';
+    db.query(sql, [email], (err, result) => {
+        if (err) {
+            console.error('Login failed: ', err);
+            return res.status(500).json({error: 'Login failed'});
+        }
+
+        if (result.length === 0) {
+            return res.status(401).json({error: 'Please register first.'});
+        }
+
+        const user = result[0];
+        //password hash
+        bcrypt.compare(password, user.password, (err, isMatch) => {
+            if (err) {
+                console.error('Login failed: ', err);
+                return res.status(500).json({error:'Login failed'});
+            }
+
+            if (!isMatch) {
+                return res.status(401).json({error: 'Incorrect email or password'});
+            }
+
+            //send token as response
+            return res.status(200).json({
+                message: 'Login successful',
+                //token: token
+            });
+        });
     });
 });
 
-app.get('/tips/3', (req, res) => {
-    res.send({
-       data: {
-           tips: 'Listen to your favorite music'
-       }
-    });
-});
+//logout user
+app.post('/logout', (req, res) => {
+    const { email } = req.query;
+    const sql = 'DELETE FROM users WHERE email = ?';
 
-app.get('/tips/4', (req, res) => {
-    res.send({
-       data: {
-           tips: 'Spending time in nature'
-       }
-    });
-});
-
-app.get('/tips/5', (req, res) => {
-    res.send({
-       data: {
-           tips: 'Writing or journaling about what you are experiencing'
-       }
+    db.query(sql, [`%${email}%`], (error, results) => {
+        if (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Logout failed' });
+        } 
+        
+        return res.status(200).json({
+            message: 'Logout successful',
+        });
     });
 });
 
 
-//GET aerticle by Id
-app.get('/article/1', (req, res) => {
-    res.send({
-        data: {
-            article: 'https://scholarworks.calstate.edu/downloads/5712mc40c'
+//get users data by email
+app.get('/usersdata', (req, res) => {
+    const { email } = req.query;
+    const sql = 'SELECT * FROM users WHERE email LIKE ?';
+
+    db.query(sql , [`%${email}%`], (error, results) => {
+        if (error) {
+            console.error(error);
+            res.status(500).json({ message: 'server error' });
+        } 
+        
+        return res.status(200).json({
+            users: results,
+        });
         }
-     });
-});
-
-app.get('/article/2', (req, res) => {
-    res.send({
-        data: {
-            article: 'https://pdfs.semanticscholar.org/1e57/098b398a70ea7f965af43e02e9e78fa4c1b0.pdf'
-        }
-     });
-});
-
-app.get('/article/3', (req, res) => {
-    res.send({
-        data: {
-            article: 'https://onlinelibrary.wiley.com/doi/10.1002/mhw.31471'
-        }
-     });
-});
-
-app.get('/article/4', (req, res) => {
-    res.send({
-        data: {
-            article: 'https://academic.oup.com/pcm/article/3/3/161/5861360'
-        }
-     });
-});
-
-app.get('/article/5', (req, res) => {
-    res.send({
-        data: {
-            article: 'https://www.jahonline.org/action/showPdf?pii=S1054-139X%2818%2930479-8'
-        }
-     });
-});
-
-
-
-//GET the counselling service contact by Id
-app.get('/contact/1', (req, res) => {
-    res.send({
-        data: {
-            contact: 'https://cmlabs.co/id-id/promo/free-consultation-benefit'
-        }
-     });
-});
-
-app.get('/contact/2', (req, res) => {
-    res.send({
-        data: {
-            contact: 'http://www.brainfit.co.id/free-consultation-2/'
-        }
-     });
-});
-
-app.get('/contact/3', (req, res) => {
-    res.send({
-        data: {
-            contact: 'https://hopeforhealingfoundation.org'
-        }
-     });
-});
-
-app.get('/contact/4', (req, res) => {
-    res.send({
-        data: {
-            contact: 'https://www.aeccglobal.co.id/id/contact-us/'
-        }
-     });
-});
-
-app.get('/contact/5', (req, res) => {
-    res.send({
-        data: {
-            contact: 'https://www.ibunda.id/'
-        }
-     });
+    );
 });
